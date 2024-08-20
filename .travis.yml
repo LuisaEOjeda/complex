@@ -1,0 +1,25 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t lojeda2024/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true lojeda2024/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t lojeda2024/multi-client ./client
+  - docker build -t lojeda2024/multi-nginx ./nginx
+  - docker build -t lojeda2024/multi-server ./server
+  - docker build -t lojeda2024/multi-worker ./worker
+  
+  
+  #log into docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  #tqake those images and push them to docker hub
+  - docker push lojeda2024/multi-client
+  - docker push lojeda2024/multi-nginx
+  - docker push lojeda2024/multi-server
+  - docker push lojeda2024/multi-worker
