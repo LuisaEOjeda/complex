@@ -1,0 +1,54 @@
+#version: '3'
+services: 
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_USER: lojeda
+      POSTGRES_PASSWORD: Caracas/1983
+      POSTGRES_DB: complexapp
+  redis:
+    image: 'redis:latest'
+  nginx:
+    restart: always
+    depends_on:
+      - api
+      - client
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client/nginx
+    ports:
+      - "3050:80"
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=lojeda  # Match this with POSTGRES_USER
+      - PGHOST=postgres
+      - PGDATABASE=complexapp
+      - PGPASSWORD=Caracas/1983  # Match this with POSTGRES_PASSWORD
+      - PGPORT=5432
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment:
+      - WDS_SOCKET_PORT=0
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
