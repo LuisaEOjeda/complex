@@ -23,3 +23,15 @@ after_success:
   - docker push lojeda2024/multi-nginx
   - docker push lojeda2024/multi-server
   - docker push lojeda2024/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'eu-west-3'
+  app: 'multi-docker'
+  env: 'MultiDocker-env'
+  bucket_name: 'elasticbeanstalk-eu-west-3-024848456870'
+  bucket_path: 'docker-multi'
+  on:
+    branch: feature
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
