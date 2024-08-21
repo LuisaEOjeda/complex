@@ -10,6 +10,7 @@
 
 # production
 /build
+Dockerrun.aws.json
 
 # misc
 .DS_Store
